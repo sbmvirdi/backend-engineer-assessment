@@ -56,4 +56,12 @@ public class AccountController implements AccountsApi {
 
     return new ResponseEntity<>(accountsDto, HttpStatus.OK);
   }
+
+  @Override
+  public ResponseEntity<AccountDto> updateUserInformation(
+      String accountId, CreateAccountDto createAccountDto) {
+    logger.info("Updating account for user with email: {}", createAccountDto.getEmail());
+    var account = accountService.updateAccount(accountId, createAccountDto);
+    return new ResponseEntity<>(Mapper.toAccountDto(account), HttpStatus.ACCEPTED);
+  }
 }

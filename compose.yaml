@@ -1,9 +1,92 @@
 services:
-  postgres:
-    image: 'postgres:latest'
+#  postgres:
+#    container_name: midas-postgres-db
+#    image: 'postgres:latest'
+#    environment:
+#      - 'POSTGRES_DB=mydatabase'
+#      - 'POSTGRES_PASSWORD=secret'
+#      - 'POSTGRES_USER=myuser'
+#    ports:
+#      - '5435:5432'
+
+  elasticsearch:
+    container_name: temporal-elasticsearch-app
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'cluster.routing.allocation.disk.threshold_enabled=true'
+      - 'cluster.routing.allocation.disk.watermark.low=512mb'
+      - 'cluster.routing.allocation.disk.watermark.high=256mb'
+      - 'cluster.routing.allocation.disk.watermark.flood_stage=128mb'
+      - 'discovery.type=single-node'
+      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
+      - 'xpack.security.enabled=false'
+    image: elasticsearch:7.16.2
+    networks:
+      - temporal-network-app
     ports:
-      - '5432'
+      - '9200:9200'
+    volumes:
+      - /var/lib/elasticsearch/data
+  postgresql:
+    container_name: midas-app-postgresql
+    environment:
+      POSTGRES_PASSWORD: midas-app
+      POSTGRES_USER: midas-user
+    image: postgres:13
+    networks:
+      - temporal-network-app
+    ports:
+      - '5432:5432'
+    volumes:
+      - /var/lib/postgresql/data
+  temporal:
+    container_name: temporal-app
+    depends_on:
+      - postgresql
+      - elasticsearch
+    environment:
+      - 'DB=postgresql'
+      - 'DB_PORT=5432'
+      - 'POSTGRES_USER=midas-user'
+      - 'POSTGRES_PWD=midas-app'
+      - 'POSTGRES_SEEDS=postgresql'
+      - 'DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml'
+      - 'ENABLE_ES=true'
+      - 'ES_SEEDS=elasticsearch'
+      - 'ES_VERSION=v7'
+    image: temporalio/auto-setup:1.23.0
+    networks:
+      - temporal-network-app
+    ports:
+      - "7233:7233"
+    labels:
+      kompose.volume.type: configMap
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+  temporal-admin-tools:
+    container_name: temporal-admin-tools-app
+    depends_on:
+      - temporal
+    environment:
+      - 'TEMPORAL_ADDRESS=temporal:7233'
+      - 'TEMPORAL_CLI_ADDRESS=temporal:7233'
+    image: temporalio/admin-tools:1.23.0
+    networks:
+      - temporal-network-app
+    stdin_open: true
+    tty: true
+  temporal-ui:
+    container_name: temporal-ui-app
+    depends_on:
+      - temporal
+    environment:
+      - 'TEMPORAL_ADDRESS=temporal:7233'
+      - 'TEMPORAL_CORS_ORIGINS=http://localhost:3000'
+    image: temporalio/ui:2.22.3
+    networks:
+      - temporal-network-app
+    ports:
+      - "8080:8080"
+networks:
+  temporal-network-app:
+    driver: bridge
+    name: temporal-network-app

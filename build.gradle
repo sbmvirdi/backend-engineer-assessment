@@ -25,14 +25,16 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('testcontainers.version', "1.19.3")
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
+    implementation 'com.fasterxml.jackson:jackson-bom:2.17.0'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
@@ -48,6 +50,8 @@ dependencies {
 
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+//    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
+
 
     implementation 'io.temporal:temporal-spring-boot-starter-alpha:1.22.3'
 
@@ -58,6 +62,12 @@ dependencies {
     implementation 'io.gsonfire:gson-fire:1.9.0'
 
     implementation "com.stripe:stripe-java:24.14.0"
+
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'io.temporal:temporal-testing:1.23.1'
+
 }
 
 tasks.named('test') {

@@ -1,12 +1,16 @@
 package com.midas.app.services;
 
+import com.midas.app.exceptions.ResourceNotFoundException;
 import com.midas.app.models.Account;
 import com.midas.app.repositories.AccountRepository;
 import com.midas.app.workflows.CreateAccountWorkflow;
+import com.midas.generated.model.CreateAccountDto;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
 import io.temporal.workflow.Workflow;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -49,5 +53,24 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public List<Account> getAccounts() {
     return accountRepository.findAll();
+  }
+
+  /**
+   * updateAccounts updates the user account information
+   *
+   * @param accountId account id of the user
+   * @param createAccountDto is the details of the user to be updated.
+   * @return Account
+   */
+  @Override
+  public Account updateAccount(String accountId, CreateAccountDto createAccountDto) {
+    var account = accountRepository.findById(UUID.fromString(accountId)).orElse(null);
+    if (Objects.isNull(account)) throw new ResourceNotFoundException();
+
+    account.setFirstName(createAccountDto.getFirstName());
+    account.setLastName(createAccountDto.getLastName());
+    account.setEmail(createAccountDto.getEmail());
+
+    return accountRepository.save(account);
   }
 }

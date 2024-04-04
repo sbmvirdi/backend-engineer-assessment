@@ -2,11 +2,12 @@ package com.midas.app.mappers;
 
 import com.midas.app.models.Account;
 import com.midas.generated.model.AccountDto;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Mapper {
-  // Prevent instantiation
-  private Mapper() {}
 
   /**
    * toAccountDto maps an account to an account dto.
@@ -22,6 +23,8 @@ public class Mapper {
         .firstName(account.getFirstName())
         .lastName(account.getLastName())
         .email(account.getEmail())
+        .providerType(account.getProviderType().value)
+        .providerId(account.getProviderId())
         .createdAt(account.getCreatedAt())
         .updatedAt(account.getUpdatedAt());
 

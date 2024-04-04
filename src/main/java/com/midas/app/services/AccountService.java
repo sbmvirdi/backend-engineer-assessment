@@ -1,6 +1,7 @@
 package com.midas.app.services;
 
 import com.midas.app.models.Account;
+import com.midas.generated.model.CreateAccountDto;
 import java.util.List;
 
 public interface AccountService {
@@ -18,4 +19,6 @@ public interface AccountService {
    * @return List<Account>
    */
   List<Account> getAccounts();
+
+  Account updateAccount(String accountId, CreateAccountDto createAccountDto);
 }
