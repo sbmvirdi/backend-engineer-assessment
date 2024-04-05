@@ -18,13 +18,27 @@ public class AccountActivityImpl implements AccountActivity {
   private final AccountRepository accountRepository;
   private final StripePaymentProvider stripePaymentProvider;
 
+  /**
+   * Function to save the account in database
+   *
+   * @param account is the account to be saved
+   * @return account saved in database
+   */
   @Override
   public Account saveAccount(Account account) {
+    // saving the account in account repository
     return accountRepository.save(account);
   }
 
+  /**
+   * Function to create payment account in stripe
+   *
+   * @param account is the account to be created
+   * @return created user account
+   */
   @Override
   public Account createPaymentAccount(Account account) {
+    // calling the stripe provider to create a user in stripe
     return stripePaymentProvider.createAccount(
         CreateAccount.builder()
             .userId(account.getId().toString())

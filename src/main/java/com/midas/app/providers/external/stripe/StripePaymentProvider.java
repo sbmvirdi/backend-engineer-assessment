@@ -40,13 +40,18 @@ public class StripePaymentProvider implements PaymentProvider {
   @Override
   public Account createAccount(CreateAccount details) {
     try {
+      // attaching the api key to the stripe sdk
       Stripe.apiKey = configuration.getApiKey();
+
+      // creating customer in stripe
       Customer customer =
           Customer.create(
               CustomerCreateParams.builder()
                   .setEmail(details.getEmail())
                   .setName(String.join(" ", details.getFirstName(), details.getLastName()))
                   .build());
+
+      // returning the user account with providerType and providerId generated through stripe
       return Account.builder()
           .id(UUID.fromString(details.getUserId()))
           .firstName(details.getFirstName())
@@ -56,6 +61,7 @@ public class StripePaymentProvider implements PaymentProvider {
           .email(details.getEmail())
           .build();
     } catch (StripeException e) {
+      // if stripe integration is failed throwing error
       throw new ApiException(HttpStatus.BAD_REQUEST, "failed to create customer");
     }
   }

@@ -57,10 +57,18 @@ public class AccountController implements AccountsApi {
     return new ResponseEntity<>(accountsDto, HttpStatus.OK);
   }
 
+  /**
+   * PATCH /accounts/{accountId} : Update user account details
+   *
+   * @param accountId Id of the user account to update (required)
+   * @param createAccountDto User account details (required)
+   * @return User account updated (status code 202)
+   */
   @Override
   public ResponseEntity<AccountDto> updateUserInformation(
       String accountId, CreateAccountDto createAccountDto) {
     logger.info("Updating account for user with email: {}", createAccountDto.getEmail());
+
     var account = accountService.updateAccount(accountId, createAccountDto);
     return new ResponseEntity<>(Mapper.toAccountDto(account), HttpStatus.ACCEPTED);
   }

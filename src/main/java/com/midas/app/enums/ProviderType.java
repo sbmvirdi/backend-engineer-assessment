@@ -3,6 +3,7 @@ package com.midas.app.enums;
 import java.util.Arrays;
 
 public enum ProviderType {
+  /** Enum to maintain payment providers */
   STRIPE("stripe");
 
   public final String value;

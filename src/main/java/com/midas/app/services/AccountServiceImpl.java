@@ -64,13 +64,18 @@ public class AccountServiceImpl implements AccountService {
    */
   @Override
   public Account updateAccount(String accountId, CreateAccountDto createAccountDto) {
+    // fetching existing account by account id
     var account = accountRepository.findById(UUID.fromString(accountId)).orElse(null);
+
+    // if account does not exist then throwing exception
     if (Objects.isNull(account)) throw new ResourceNotFoundException();
 
+    // updating the user information
     account.setFirstName(createAccountDto.getFirstName());
     account.setLastName(createAccountDto.getLastName());
     account.setEmail(createAccountDto.getEmail());
 
+    // saving the latest information of the user
     return accountRepository.save(account);
   }
 }
