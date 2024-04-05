@@ -15,5 +15,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'zulu'
+      - name: Run Docker Compose
+        run: docker compose up -d
       - name: Build
         run:  gradle wrapper && chmod 700 gradlew && ./gradlew clean build
